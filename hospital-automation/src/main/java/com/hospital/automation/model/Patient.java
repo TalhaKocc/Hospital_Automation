@@ -13,7 +13,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "patients")
-public class Patient {
+public class Patient {   
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
