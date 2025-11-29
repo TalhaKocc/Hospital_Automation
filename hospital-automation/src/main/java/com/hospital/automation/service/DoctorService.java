@@ -2,7 +2,6 @@ package com.hospital.automation.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,8 +64,7 @@ public class DoctorService {
 	                    d.getRoomNumber(),
 	                    d.getGender(),
 	                    d.getSalary()
-					))
-				.collect(Collectors.toList());
+					)).toList();
 	}
 
 	public void deleteDoctor(Integer doctorId) {
@@ -101,5 +99,25 @@ public class DoctorService {
 		doctor.setPhoneNumber(updateDoctorDto.getDoctorPhoneNumber());
 		doctor.setRoomNumber(updateDoctorDto.getDoctorRoomNumber());
 	}
+
+	public UpdateDoctorDto getUpdateDoctor(Integer doctorId) {
+
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doktor bulunamadı"));
+
+        User user = doctor.getUser();
+
+        UpdateDoctorDto dto = new UpdateDoctorDto();
+        dto.setDoctorId(doctor.getId());
+        dto.setUserId(user.getId());
+        dto.setDoctorName(user.getName());
+        dto.setDoctorSurname(user.getSurname());
+        dto.setDoctorEmail(user.getEmail());
+        dto.setDoctorPassword(user.getPassword());
+        dto.setDoctorPhoneNumber(doctor.getPhoneNumber());
+        dto.setDoctorRoomNumber(doctor.getRoomNumber());
+
+        return dto;
+    }
 }
 

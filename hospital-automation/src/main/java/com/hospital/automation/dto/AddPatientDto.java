@@ -14,6 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddPatientDto {
+	
 	private String patientName;
 	private String patientSurname;
 	private String patientEmail;
