@@ -50,6 +50,7 @@ public class AppointmentService {
         appointment.setDoctor(doctor);
         appointment.setAppointmentDate(appointmentCreateDto.getAppointmentDate());
         appointment.setAppointmentTime(appointmentCreateDto.getAppointmentTime());
+        appointmentRepository.save(appointment);
 	}
 
 	public void deleteAppointment(Integer appointmentId) {

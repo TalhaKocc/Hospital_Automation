@@ -18,7 +18,7 @@ public class UserService {
 	
 	public User login(LoginDto loginDto) {
 		
-		User user = userRepository.finByEmail(loginDto.getEmail())
+		User user = userRepository.findByEmail(loginDto.getEmail())
 				.orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 		
 		if(!user.getPassword().equals(loginDto.getPassword())) {
