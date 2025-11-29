@@ -1,0 +1,105 @@
+package com.hospital.automation.service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hospital.automation.dto.AddDoctorDto;
+import com.hospital.automation.dto.ListAllDoctorDto;
+import com.hospital.automation.dto.UpdateDoctorDto;
+import com.hospital.automation.model.Department;
+import com.hospital.automation.model.Doctor;
+import com.hospital.automation.model.User;
+import com.hospital.automation.model.User.Role;
+import com.hospital.automation.repository.DepartmentRepository;
+import com.hospital.automation.repository.DoctorRepository;
+import com.hospital.automation.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class DoctorService {
+
+	private final DoctorRepository doctorRepository;
+	private final UserRepository userRepository;
+	private final DepartmentRepository departmentRepository;
+	
+	public void addDoctor(AddDoctorDto addDoctorDto) {
+		
+		User user = new User();
+		user.setName(addDoctorDto.getDoctorName());
+		user.setSurname(addDoctorDto.getDoctorSurname());
+		user.setEmail(addDoctorDto.getDoctorEmail());
+		user.setPassword(addDoctorDto.getDoctorPassword());
+		user.setRole(Role.DOCTOR);
+		
+		User savedUser = userRepository.save(user);
+		
+		Department department = departmentRepository.findByName(addDoctorDto.getDoctorDepartment())
+				.orElseThrow(() -> new RuntimeException("Departman Bulunamadı: " + addDoctorDto.getDoctorDepartment()));
+	
+		Doctor doctor = new Doctor();
+		doctor.setUser(savedUser);
+		doctor.setDepartment(department);
+		doctor.setPhoneNumber(addDoctorDto.getDoctorPhoneNumber());
+		doctor.setRoomNumber(addDoctorDto.getDoctorRoomNumber());
+		doctor.setGender(addDoctorDto.getDoctorGender());
+		doctor.setSalary(addDoctorDto.getDoctorSalary());
+		
+		doctorRepository.save(doctor);
+	}
+
+	public List<ListAllDoctorDto> listAllDoctor(){
+		return doctorRepository.findAll().stream()
+				.map(d -> new ListAllDoctorDto(
+						d.getId(),
+						d.getUser().getName(),
+						d.getUser().getSurname(),
+						d.getDepartment().getName(),
+						d.getPhoneNumber(),
+	                    d.getRoomNumber(),
+	                    d.getGender(),
+	                    d.getSalary()
+					))
+				.collect(Collectors.toList());
+	}
+
+	public void deleteDoctor(Integer doctorId) {
+		Doctor doctor = doctorRepository.findById(doctorId).
+				orElseThrow(() -> new RuntimeException("Doktor Bulunamadı"));
+		
+		Integer userId = doctor.getUser().getId();
+		
+		doctorRepository.deleteById(doctorId);
+		userRepository.deleteById(userId);
+	}
+
+	public void updatedoctorSalary(Integer doctorId,BigDecimal salary) {
+		
+		Doctor doctor = doctorRepository.findById(doctorId).
+				orElseThrow(() -> new RuntimeException("Doktor Bulunamadı"));
+		doctor.setSalary(salary);
+	}
+	
+	public void updateDoctor(UpdateDoctorDto updateDoctorDto) {
+		
+		Doctor doctor = doctorRepository.findById(updateDoctorDto.getDoctorId()).
+				orElseThrow(() -> new RuntimeException("Doktor Bulunamadı"));
+		User user = userRepository.findById(updateDoctorDto.getUserId()).
+				orElseThrow(() -> new RuntimeException("Kullanıcı Bulunamadı"));
+		
+		user.setName(updateDoctorDto.getDoctorName());
+		user.setSurname(updateDoctorDto.getDoctorSurname());
+		user.setEmail(updateDoctorDto.getDoctorEmail());
+		user.setPassword(updateDoctorDto.getDoctorPassword());
+		
+		doctor.setPhoneNumber(updateDoctorDto.getDoctorPhoneNumber());
+		doctor.setRoomNumber(updateDoctorDto.getDoctorRoomNumber());
+	}
+}
+
