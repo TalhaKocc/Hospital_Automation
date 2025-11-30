@@ -10,4 +10,6 @@ import com.hospital.automation.model.Appointment;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer>{
 	List<Appointment> findByPatientId(Integer patientId);
+	List<Appointment> findByDoctorId(Integer doctorId);
+
 }

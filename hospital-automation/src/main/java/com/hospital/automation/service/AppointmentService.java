@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hospital.automation.dto.AppointmentCreateDto;
 import com.hospital.automation.dto.ListAllAppointmentDto;
+import com.hospital.automation.dto.ListDoctorAppointmentDto;
 import com.hospital.automation.dto.ListPatientAppointmentDto;
 import com.hospital.automation.model.Appointment;
 import com.hospital.automation.model.Doctor;
@@ -39,6 +40,19 @@ public class AppointmentService {
 				.toList();
 	}
 
+	public List<ListDoctorAppointmentDto> listDoctorAppointment(Integer doctorId){
+		
+		return appointmentRepository.findByDoctorId(doctorId).stream()
+				.map(d -> new ListDoctorAppointmentDto(
+						d.getId(),
+						d.getPatient().getUser().getName() + " " + d.getPatient().getUser().getSurname(),
+						d.getDoctor().getDepartment().getName(),
+						d.getAppointmentDate(),
+						d.getAppointmentTime()
+				))
+				.toList();
+	}
+	
 	public void createAppointment(AppointmentCreateDto appointmentCreateDto,Integer patientId) {
 		Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Hasta bulunamadı"));

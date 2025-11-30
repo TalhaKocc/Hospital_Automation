@@ -125,5 +125,10 @@ public class DoctorService {
 	            .orElseThrow(() -> new RuntimeException("Doktor bulunamadı"));
 	}
 
+	public Doctor getDoctorByUserId(Integer userId) {
+	    return doctorRepository.findByUserId(userId)
+	            .orElseThrow(() -> new RuntimeException("Doktor bulunamadı (User ID ile)."));
+	}
+
 }
 
