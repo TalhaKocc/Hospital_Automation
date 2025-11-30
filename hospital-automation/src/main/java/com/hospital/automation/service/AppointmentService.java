@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hospital.automation.dto.AppointmentCreateDto;
+import com.hospital.automation.dto.ListAllAppointmentDto;
 import com.hospital.automation.dto.ListPatientAppointmentDto;
 import com.hospital.automation.model.Appointment;
 import com.hospital.automation.model.Doctor;
@@ -24,7 +25,7 @@ public class AppointmentService {
 	 private final AppointmentRepository appointmentRepository;
 	 private final DoctorRepository doctorRepository;
 	 private final PatientRepository patientRepository;
-	
+	 
 	public List<ListPatientAppointmentDto> listPatientAppointment(Integer patientId){
 		
 		return appointmentRepository.findByPatientId(patientId).stream()
@@ -55,5 +56,21 @@ public class AppointmentService {
 
 	public void deleteAppointment(Integer appointmentId) {
 		appointmentRepository.deleteById(appointmentId);
+	}
+
+	public List<ListAllAppointmentDto> listAllAppointment(){
+		return appointmentRepository.findAll().stream()
+				.map(a -> new ListAllAppointmentDto(
+						a.getId(),
+						a.getPatient().getUser().getName(),
+						a.getPatient().getUser().getSurname(),
+						a.getPatient().getNationalId(),
+						a.getPatient().getBirthDate(),
+	                    a.getDoctor().getUser().getName(),
+	                    a.getDoctor().getUser().getSurname(),
+	                    a.getDoctor().getDepartment().getName(),
+	                    a.getAppointmentDate(),
+	                    a.getAppointmentTime()
+					)).toList();
 	}
 }

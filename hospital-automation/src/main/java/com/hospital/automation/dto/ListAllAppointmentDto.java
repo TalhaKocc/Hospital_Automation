@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ListAllAppointmentDto {
-
+	private Integer appointmentId;
 	private String patientName;
 	private String patientSurname;
 	private String patientNationalId;
