@@ -119,5 +119,11 @@ public class DoctorService {
 
         return dto;
     }
+
+	public Doctor getDoctorById(Integer id) {
+	    return doctorRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Doktor bulunamadı"));
+	}
+
 }
 

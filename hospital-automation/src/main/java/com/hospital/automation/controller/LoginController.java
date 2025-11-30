@@ -30,7 +30,7 @@ public class LoginController {
 		try {
 			User user = userService.login(loginDto);
 			session.setAttribute("userId", user.getId());
-			session.setAttribute("password", user.getRole().toString());
+			session.setAttribute("role", user.getRole().toString());
 			
 			if(user.getRole().toString().equals("ADMIN")) {
 				return "redirect:/admin/dashboard";
@@ -40,8 +40,9 @@ public class LoginController {
 				return "redirect:/patient/dashboard";
 			}
 		} catch (RuntimeException e) {
-			model.addAttribute("error",e.getMessage());
-			return "login";
+			model.addAttribute("error", e.getMessage());
+		    model.addAttribute("login", loginDto); 
+		    return "login";
 		}
 	}
 		

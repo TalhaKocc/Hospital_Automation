@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Maaş Güncelle</title>
+</head>
+<body>
+
+<h2 th:text="'Maaş Güncelle: ' + ${doctor.user.name} + ' ' + ${doctor.user.surname}"></h2>
+
+<form th:action="@{/admin/doctors/update-salary}" th:object="${salaryDto}" method="post">
+
+    <input type="hidden" th:field="*{doctorId}" />
+
+    <label>Yeni Maaş:</label>
+    <input type="number" step="0.01" th:field="*{salary}" required />
+
+    <button type="submit">Güncelle</button>
+
+</form>
+
+</body>
+</html>

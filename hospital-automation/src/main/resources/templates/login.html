@@ -8,16 +8,24 @@
 
 <h2>Giriş Yap</h2>
 
+<!-- HATA MESAJI GÖSTERME -->
+<div th:if="${error}" style="color:red;">
+    <p th:text="${error}"></p>
+</div>
+
 <form th:action="@{/login}" th:object="${login}" method="post">
 
-    Email:
+    <label>Email:</label>
     <input type="email" th:field="*{email}" required /><br/><br/>
 
-    Şifre:
+    <label>Şifre:</label>
     <input type="password" th:field="*{password}" required /><br/><br/>
 
     <button type="submit">Giriş Yap</button>
 
+	<span style="margin-left:15px;">
+	        <a th:href="@{/register}">Hasta Kayıt Ekranı</a>
+	    </span>
 </form>
 
 </body>

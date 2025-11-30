@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Doktor Listesi</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sol Menü */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+
+        .logout {
+            margin-top: auto;
+            background-color: #c0392b !important;
+        }
+
+        .logout:hover {
+            background-color: #e74c3c !important;
+        }
+
+        /* Sağ içerik */
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: #ecf0f1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-add {
+            padding: 10px 15px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .btn-add:hover {
+            background-color: #2ecc71;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background: #bdc3c7;
+        }
+
+        .btn {
+            padding: 7px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-update-salary {
+            background-color: #2980b9;
+        }
+
+        .btn-edit {
+            background-color: #f39c12;
+        }
+
+        .btn-delete {
+            background-color: #c0392b;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- SOL MENÜ -->
+<div class="sidebar">
+    <h2>Admin Paneli</h2>
+
+    <a th:href="@{/admin/doctors}">Doktor İşlemleri</a>
+    <a th:href="@{/admin/patients}">Hasta İşlemleri</a>
+    <a th:href="@{/admin/appointments}">Randevu İşlemleri</a>
+
+    <a th:href="@{/logout}" class="logout">Çıkış Yap</a>
+</div>
+
+<!-- SAĞ İÇERİK -->
+<div class="content">
+
+    <div class="header">
+        <h1>Hasta Listesi</h1>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Ad</th>
+            <th>Soyad</th>
+            <th>Cinsiyet</th>
+            <th>T.C.</th>
+            <th>Telefon Numarası</th>
+            <th>Doğum Tarihi</th>
+            <th>İşlemler</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="p : ${patients}">
+            <td th:text="${p.patientName}"></td>
+            <td th:text="${p.patientSurname}"></td>
+            <td th:text="${p.patientGender}"></td>
+            <td th:text="${p.nationalId}"></td>
+            <td th:text="${p.patientPhoneNumber}"></td>
+            <td th:text="${p.patientBirthDate}"></td>
+
+            <td>
+
+                <!-- Sil -->
+                <a th:href="@{'/admin/patients/delete/' + ${p.patientId}}">
+                    <button class="btn btn-delete">Sil</button>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+</div>
+
+</body>
+</html>

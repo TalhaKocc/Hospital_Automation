@@ -30,7 +30,7 @@ public class Patient {
 	@Column(name = "phone_number",nullable = false)
 	private String phoneNumber;
 	
-	@Column(name = "date_birth",nullable = false)
+	@Column(name = "birth_date",nullable = false)
 	private LocalDate birthDate;
 	
 	@OneToMany(mappedBy = "patient")
