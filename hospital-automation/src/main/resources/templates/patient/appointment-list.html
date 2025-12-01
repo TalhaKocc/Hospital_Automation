@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Randevularım</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+            cursor: pointer;
+        }
+
+        .logout {
+            margin-top: auto;
+            background-color: #c0392b !important;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: #ecf0f1;
+        }
+
+        table {
+            width: 70%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #2980b9;
+            color: white;
+            text-align: left;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-btn {
+            background:#27ae60;
+            padding:10px 15px;
+            color:white;
+            text-decoration:none;
+            border-radius:5px;
+            font-size:15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Sol Menü -->
+<div class="sidebar">
+    <h2>Hasta Paneli</h2>
+
+    <a th:href="@{/patient/profile}">Kişisel Bilgiler</a>
+    <a th:href="@{/patient/appointment}">Randevularım</a>
+
+    <a th:href="@{/logout}" class="logout">Çıkış Yap</a>
+</div>
+
+<!-- Sağ İçerik -->
+<div class="content">
+
+    <div class="header-row">
+        <h1>Randevularım</h1>
+
+        <a th:href="@{/patient/appointment/add}" class="add-btn">
+            ➕ Randevu Ekle
+        </a>
+    </div>
+
+    <table>
+        <tr>
+            <th>Doktor</th>
+            <th>Bölüm</th>
+            <th>Tarih</th>
+            <th>Saat</th>
+        </tr>
+
+        <tr th:each="a : ${appointments}">
+            <td th:text="${a.doctorName}"></td>
+            <td th:text="${a.departmentName}"></td>
+            <td th:text="${a.appointmentDate}"></td>
+            <td th:text="${a.appointmentTime}"></td>
+        </tr>
+
+    </table>
+
+</div>
+
+</body>
+</html>

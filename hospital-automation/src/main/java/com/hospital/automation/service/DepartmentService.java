@@ -51,4 +51,9 @@ public class DepartmentService {
 		return departmentRepository.findById(departmentId)
 				.orElseThrow(() -> new RuntimeException("Departman Bulunamadı"));
 	}
+
+	public List<Department> listAllDepartments() {
+	    return departmentRepository.findAll();
+	}
+
 }

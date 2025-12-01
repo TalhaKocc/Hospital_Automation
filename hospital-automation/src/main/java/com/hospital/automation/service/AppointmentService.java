@@ -6,13 +6,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hospital.automation.dto.AppointmentCreateDto;
+import com.hospital.automation.dto.AppointmentMailEvent;
 import com.hospital.automation.dto.ListAllAppointmentDto;
 import com.hospital.automation.dto.ListDoctorAppointmentDto;
 import com.hospital.automation.dto.ListPatientAppointmentDto;
+import com.hospital.automation.kafka.producer.AppointmentProducer;
 import com.hospital.automation.model.Appointment;
+import com.hospital.automation.model.Department;
 import com.hospital.automation.model.Doctor;
 import com.hospital.automation.model.Patient;
 import com.hospital.automation.repository.AppointmentRepository;
+import com.hospital.automation.repository.DepartmentRepository;
 import com.hospital.automation.repository.DoctorRepository;
 import com.hospital.automation.repository.PatientRepository;
 
@@ -22,69 +26,134 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class AppointmentService {
-	
-	 private final AppointmentRepository appointmentRepository;
-	 private final DoctorRepository doctorRepository;
-	 private final PatientRepository patientRepository;
-	 
-	public List<ListPatientAppointmentDto> listPatientAppointment(Integer patientId){
-		
-		return appointmentRepository.findByPatientId(patientId).stream()
-				.map(a -> new ListPatientAppointmentDto(
-						a.getId(),
-						a.getDoctor().getUser().getName() + " " + a.getDoctor().getUser().getSurname(),
-						a.getDoctor().getDepartment().getName(),
-						a.getAppointmentDate(),
-						a.getAppointmentTime()
-				))
-				.toList();
-	}
 
-	public List<ListDoctorAppointmentDto> listDoctorAppointment(Integer doctorId){
-		
-		return appointmentRepository.findByDoctorId(doctorId).stream()
-				.map(d -> new ListDoctorAppointmentDto(
-						d.getId(),
-						d.getPatient().getUser().getName() + " " + d.getPatient().getUser().getSurname(),
-						d.getDoctor().getDepartment().getName(),
-						d.getAppointmentDate(),
-						d.getAppointmentTime()
-				))
-				.toList();
-	}
-	
-	public void createAppointment(AppointmentCreateDto appointmentCreateDto,Integer patientId) {
-		Patient patient = patientRepository.findById(patientId)
+    private final AppointmentRepository appointmentRepository;
+    private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
+    private final DepartmentRepository departmentRepository;
+
+    private final AppointmentProducer appointmentProducer; // 🔥 EKLENDİ
+
+
+    public List<ListPatientAppointmentDto> listPatientAppointment(Integer patientId){
+
+        return appointmentRepository.findByPatientId(patientId).stream()
+                .map(a -> new ListPatientAppointmentDto(
+                        a.getId(),
+                        a.getDoctor().getUser().getName() + " " + a.getDoctor().getUser().getSurname(),
+                        a.getDoctor().getDepartment().getName(),
+                        a.getAppointmentDate(),
+                        a.getAppointmentTime()
+                ))
+                .toList();
+    }
+
+    public List<ListDoctorAppointmentDto> listDoctorAppointment(Integer doctorId){
+
+        return appointmentRepository.findByDoctorId(doctorId).stream()
+                .map(d -> new ListDoctorAppointmentDto(
+                        d.getId(),
+                        d.getPatient().getUser().getName() + " " + d.getPatient().getUser().getSurname(),
+                        d.getDoctor().getDepartment().getName(),
+                        d.getAppointmentDate(),
+                        d.getAppointmentTime()
+                ))
+                .toList();
+    }
+
+
+    // ---------------------------------------------------------
+    // 🔥 RANDEVU OLUŞTURAN METOT (Mail Event Eklenmiş Hali)
+    // ---------------------------------------------------------
+    public void createAppointment(AppointmentCreateDto dto, Integer patientId) {
+
+        Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Hasta bulunamadı"));
 
-        Doctor doctor = doctorRepository.findById(appointmentCreateDto.getDoctorId())
+        Doctor doctor = doctorRepository.findById(dto.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doktor bulunamadı"));
-        
+
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
-        appointment.setAppointmentDate(appointmentCreateDto.getAppointmentDate());
-        appointment.setAppointmentTime(appointmentCreateDto.getAppointmentTime());
-        appointmentRepository.save(appointment);
-	}
+        appointment.setAppointmentDate(dto.getAppointmentDate());
+        appointment.setAppointmentTime(dto.getAppointmentTime());
 
-	public void deleteAppointment(Integer appointmentId) {
-		appointmentRepository.deleteById(appointmentId);
-	}
+        Appointment saved = appointmentRepository.save(appointment);
 
-	public List<ListAllAppointmentDto> listAllAppointment(){
-		return appointmentRepository.findAll().stream()
-				.map(a -> new ListAllAppointmentDto(
-						a.getId(),
-						a.getPatient().getUser().getName(),
-						a.getPatient().getUser().getSurname(),
-						a.getPatient().getNationalId(),
-						a.getPatient().getBirthDate(),
-	                    a.getDoctor().getUser().getName(),
-	                    a.getDoctor().getUser().getSurname(),
-	                    a.getDoctor().getDepartment().getName(),
-	                    a.getAppointmentDate(),
-	                    a.getAppointmentTime()
-					)).toList();
-	}
+        // 🔥 KAFKA EVENT OLUŞTUR
+        AppointmentMailEvent event = new AppointmentMailEvent(
+                patient.getUser().getEmail(),
+                patient.getUser().getName() + " " + patient.getUser().getSurname(),
+                doctor.getUser().getName() + " " + doctor.getUser().getSurname(),
+                doctor.getDepartment().getName(),
+                saved.getAppointmentDate().toString(),
+                saved.getAppointmentTime().toString()
+        );
+
+        // 🔥 PRODUCER'ı TETİKLE → KAFKA'YA GÖNDER
+        appointmentProducer.sendMailEvent(event);
+    }
+
+
+
+    // ---------------------------------------------------------
+    // 🔥 addAppointment — Admin'in eklediği randevu için mail event ekledik
+    // ---------------------------------------------------------
+    public void addAppointment(Integer patientId, AppointmentCreateDto dto) {
+
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Hasta bulunamadı"));
+
+        Doctor doctor = doctorRepository.findById(dto.getDoctorId())
+                .orElseThrow(() -> new RuntimeException("Doktor bulunamadı"));
+
+        Department department = departmentRepository.findById(dto.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Bölüm bulunamadı"));
+
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setAppointmentDate(dto.getAppointmentDate());
+        appointment.setAppointmentTime(dto.getAppointmentTime());
+
+        Appointment saved = appointmentRepository.save(appointment);
+
+        // 🔥 KAFKA EVENT
+        AppointmentMailEvent event = new AppointmentMailEvent(
+                patient.getUser().getEmail(),
+                patient.getUser().getName() + " " + patient.getUser().getSurname(),
+                doctor.getUser().getName() + " " + doctor.getUser().getSurname(),
+                doctor.getDepartment().getName(),
+                saved.getAppointmentDate().toString(),
+                saved.getAppointmentTime().toString()
+        );
+
+        appointmentProducer.sendMailEvent(event);
+    }
+
+
+
+    public void deleteAppointment(Integer appointmentId) {
+        appointmentRepository.deleteById(appointmentId);
+    }
+
+
+    public List<ListAllAppointmentDto> listAllAppointment(){
+
+        return appointmentRepository.findAll().stream()
+                .map(a -> new ListAllAppointmentDto(
+                        a.getId(),
+                        a.getPatient().getUser().getName(),
+                        a.getPatient().getUser().getSurname(),
+                        a.getPatient().getNationalId(),
+                        a.getPatient().getBirthDate(),
+                        a.getDoctor().getUser().getName(),
+                        a.getDoctor().getUser().getSurname(),
+                        a.getDoctor().getDepartment().getName(),
+                        a.getAppointmentDate(),
+                        a.getAppointmentTime()
+                ))
+                .toList();
+    }
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Randevu Ekle</title>
+</head>
+<body>
+
+<h2>Randevu Oluştur</h2>
+
+<form th:action="@{/patient/appointment/add}" method="post" th:object="${appointment}">
+    
+    <label>Bölüm:</label>
+    <select th:field="*{departmentId}">
+        <option th:each="d : ${departments}"
+                th:value="${d.id}"
+                th:text="${d.name}">
+        </option>
+    </select><br><br>
+
+    <label>Doktor:</label>
+    <select th:field="*{doctorId}">
+        <option th:each="dr : ${doctors}"
+                th:value="${dr.doctorId}"
+                th:text="${dr.doctorName}">
+        </option>
+    </select><br><br>
+
+    <label>Tarih:</label>
+    <input type="date" th:field="*{appointmentDate}"><br><br>
+
+    <label>Saat:</label>
+    <input type="time" th:field="*{appointmentTime}"><br><br>
+
+    <button type="submit">Kaydet</button>
+
+</form>
+
+</body>
+</html>
