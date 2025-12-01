@@ -56,7 +56,7 @@ public class DoctorService {
 		doctorRepository.save(doctor);
 	}
 	
-	//@Cacheable(value = "doctorList")
+	@Cacheable(value = "doctorList")
 	public List<ListAllDoctorDto> listAllDoctor(){
 		return doctorRepository.findAll().stream()
 				.map(d -> new ListAllDoctorDto(
@@ -71,7 +71,7 @@ public class DoctorService {
 					)).toList();
 	}
 	
-	//@CacheEvict(value = "doctorList",allEntries = true)
+	@CacheEvict(value = "doctorList",allEntries = true)
 	public void deleteDoctor(Integer doctorId) {
 		Doctor doctor = doctorRepository.findById(doctorId).
 				orElseThrow(() -> new RuntimeException("Doktor Bulunamadı"));
@@ -82,7 +82,7 @@ public class DoctorService {
 		userRepository.deleteById(userId);
 	}
 	
-	//@CacheEvict(value = "doctorList",allEntries = true)
+	@CacheEvict(value = "doctorList",allEntries = true)
 	public void updatedoctorSalary(Integer doctorId,BigDecimal salary) {
 		
 		Doctor doctor = doctorRepository.findById(doctorId).

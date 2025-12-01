@@ -1,6 +1,7 @@
 package com.hospital.automation.dto;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import com.hospital.automation.model.Doctor;
@@ -12,7 +13,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ListAllDoctorDto {
+public class ListAllDoctorDto implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private Integer doctorId;
 	private String doctorName;
 	private String doctorSurname;
