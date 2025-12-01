@@ -101,4 +101,13 @@ public class PatientService {
 		return updatePatientDto;
 	}
 
+	public Patient getPatientById(Integer id) {
+	    return patientRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Hasta bulunamadı"));
+	}
+
+	public Patient getPatientByUserId(Integer userId) {
+	    return patientRepository.findByUserId(userId)
+	            .orElseThrow(() -> new RuntimeException("Hasta  bulunamadı (User ID ile)."));
+	}
 }

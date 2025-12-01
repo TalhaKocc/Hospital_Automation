@@ -3,6 +3,8 @@ package com.hospital.automation.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ public class DoctorService {
 	private final UserRepository userRepository;
 	private final DepartmentRepository departmentRepository;
 	
+	@CacheEvict(value = "doctorList",allEntries = true)
 	public void addDoctor(AddDoctorDto addDoctorDto) {
 		
 		User user = new User();
@@ -52,7 +55,8 @@ public class DoctorService {
 		
 		doctorRepository.save(doctor);
 	}
-
+	
+	//@Cacheable(value = "doctorList")
 	public List<ListAllDoctorDto> listAllDoctor(){
 		return doctorRepository.findAll().stream()
 				.map(d -> new ListAllDoctorDto(
@@ -66,7 +70,8 @@ public class DoctorService {
 	                    d.getSalary()
 					)).toList();
 	}
-
+	
+	//@CacheEvict(value = "doctorList",allEntries = true)
 	public void deleteDoctor(Integer doctorId) {
 		Doctor doctor = doctorRepository.findById(doctorId).
 				orElseThrow(() -> new RuntimeException("Doktor Bulunamadı"));
@@ -76,13 +81,15 @@ public class DoctorService {
 		doctorRepository.deleteById(doctorId);
 		userRepository.deleteById(userId);
 	}
-
+	
+	//@CacheEvict(value = "doctorList",allEntries = true)
 	public void updatedoctorSalary(Integer doctorId,BigDecimal salary) {
 		
 		Doctor doctor = doctorRepository.findById(doctorId).
 				orElseThrow(() -> new RuntimeException("Doktor Bulunamadı"));
 		doctor.setSalary(salary);
 	}
+	
 	
 	public void updateDoctor(UpdateDoctorDto updateDoctorDto) {
 		

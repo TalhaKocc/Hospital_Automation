@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Doktor Profil</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+            cursor: pointer;
+        }
+
+        .logout {
+            margin-top: auto;
+            background-color: #c0392b !important;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: #ecf0f1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-edit {
+            padding: 10px 15px;
+            background-color: #2980b9;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .btn-edit:hover {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Sol Menü -->
+<div class="sidebar">
+    <h2>Hasta Paneli</h2>
+
+    <a th:href="@{/patient/profile}">Kişisel Bilgiler</a>
+    <a th:href="@{/patient/appointment}">Randevularım</a>
+
+    <a th:href="@{/logout}" class="logout">Çıkış Yap</a>
+</div>
+
+<!-- İçerik -->
+<div class="content">
+
+    <div class="header">
+        <h1>Kişisel Bilgiler</h1>
+        <a th:href="@{/patient/profile/update}" class="btn-edit">Bilgileri Güncelle</a>
+    </div>
+
+    <table>
+        <tr>
+            <td>Ad:</td>
+            <td th:text="${patient.user.name}"></td>
+        </tr>
+        <tr>
+            <td>Soyad:</td>
+            <td th:text="${patient.user.surname}"></td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td th:text="${patient.user.email}"></td>
+        </tr>
+        <tr>
+            <td>T.C.:</td>
+            <td th:text="${patient.nationalId}"></td>
+        </tr>
+        <tr>
+            <td>Telefon Numarası:</td>
+            <td th:text="${patient.PhoneNumber}"></td>
+        </tr>
+        <tr>
+            <td>Doğum Tarihi:</td>
+            <td th:text="${patient.birthDate}"></td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+</html>
